@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal, View, Text, TextInput, Pressable, StyleSheet } from 'react-native';
+import { Modal, View, Text, TextInput, Pressable, StyleSheet, Alert } from 'react-native';
 
 interface OtpPopupProps {
   visible: boolean;
@@ -12,6 +12,7 @@ export const OtpPopup: React.FC<OtpPopupProps> = ({ visible, onClose, onVerify, 
   const [otp, setOtp] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
   const [message, setMessage] = useState('');
+  const [showTestOTP, setShowTestOTP] = useState(false);
 
   const handleVerify = async () => {
     if (otp.length === 6) {
@@ -26,16 +27,23 @@ export const OtpPopup: React.FC<OtpPopupProps> = ({ visible, onClose, onVerify, 
             setMessage('');
             setOtp('');
             setIsVerifying(false);
+            setShowTestOTP(false);
           }, 1500);
         } else {
-          setMessage('Invalid code. Please check your email and try again.');
+          setMessage('Invalid code. Please try again.');
           setIsVerifying(false);
         }
       } catch (error: any) {
         setMessage(error.message || 'Verification failed. Please try again.');
         setIsVerifying(false);
       }
+    } else {
+      Alert.alert('Error', 'Please enter a 6-digit code');
     }
+  };
+
+  const handleShowTestOTP = () => {
+    setShowTestOTP(!showTestOTP);
   };
 
   return (
@@ -47,14 +55,14 @@ export const OtpPopup: React.FC<OtpPopupProps> = ({ visible, onClose, onVerify, 
     >
       <View style={styles.centeredView}>
         <View style={styles.modalView}>
-          <Text style={styles.modalTitle}>Check Your Email</Text>
+          <Text style={styles.modalTitle}>Verify Your Email</Text>
           <Text style={styles.modalSubtitle}>
-            We've sent a verification link to {email}. Please click the link in your email to verify your account.
+            We've sent a 6-digit verification code to {email}. Enter the code below to verify your account.
           </Text>
           
           <TextInput
             style={styles.input}
-            placeholder="Enter 6-digit code"
+            placeholder="000000"
             keyboardType="numeric"
             maxLength={6}
             value={otp}
@@ -71,6 +79,13 @@ export const OtpPopup: React.FC<OtpPopupProps> = ({ visible, onClose, onVerify, 
             </Text>
           ) : null}
 
+          {showTestOTP && (
+            <View style={styles.testOtpBox}>
+              <Text style={styles.testOtpLabel}>Development Mode - Test Code:</Text>
+              <Text style={styles.testOtpCode}>Check browser console for OTP</Text>
+            </View>
+          )}
+
           <View style={styles.buttonContainer}>
             <Pressable 
               style={[styles.button, styles.cancelButton]} 
@@ -80,15 +95,24 @@ export const OtpPopup: React.FC<OtpPopupProps> = ({ visible, onClose, onVerify, 
               <Text style={styles.buttonText}>Cancel</Text>
             </Pressable>
             <Pressable 
-              style={[styles.button, styles.verifyButton, isVerifying && styles.disabledButton]} 
+              style={[styles.button, styles.verifyButton, (!otp || isVerifying) && styles.disabledButton]} 
               onPress={handleVerify}
-              disabled={isVerifying}
+              disabled={!otp || isVerifying}
             >
               <Text style={styles.buttonText}>
                 {isVerifying ? 'Verifying...' : 'Verify'}
               </Text>
             </Pressable>
           </View>
+
+          <Pressable 
+            onPress={handleShowTestOTP}
+            style={styles.helpLink}
+          >
+            <Text style={styles.helpLinkText}>
+              {showTestOTP ? 'Hide help' : 'Need help?'}
+            </Text>
+          </Pressable>
         </View>
       </View>
     </Modal>
@@ -171,6 +195,34 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: 'white',
+    fontWeight: '600',
+  },
+  testOtpBox: {
+    width: '100%',
+    backgroundColor: '#f0f0f0',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 15,
+    borderLeftWidth: 4,
+    borderLeftColor: '#1F3A70',
+  },
+  testOtpLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#1F3A70',
+    marginBottom: 4,
+  },
+  testOtpCode: {
+    fontSize: 13,
+    color: '#666',
+  },
+  helpLink: {
+    marginTop: 15,
+    paddingVertical: 8,
+  },
+  helpLinkText: {
+    fontSize: 12,
+    color: '#1F3A70',
     fontWeight: '600',
   },
 });

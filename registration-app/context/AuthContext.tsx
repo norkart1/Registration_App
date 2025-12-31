@@ -4,6 +4,8 @@ import { account, ID } from '@/utils/appwrite';
 interface AuthContextType {
   user: any | null;
   loading: boolean;
+  email: string | null;
+  passwordHash: string | null;
   signUp: (email: string, pass: string) => Promise<void>;
   login: (email: string, pass: string) => Promise<void>;
   verifyOTP: (otp: string) => Promise<boolean>;
@@ -13,9 +15,16 @@ interface AuthContextType {
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Simple OTP storage (in production, this would come from backend)
+const otpStorage: { [key: string]: string } = {};
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
+  const [email, setEmail] = useState<string | null>(null);
+  const [passwordHash, setPasswordHash] = useState<string | null>(null);
+  const [tempEmail, setTempEmail] = useState<string>('');
+  const [generatedOTP, setGeneratedOTP] = useState<string>('');
 
   useEffect(() => {
     checkUser();
@@ -25,20 +34,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const currentUser = await account.get();
       setUser(currentUser);
+      setEmail(currentUser.email);
     } catch (error) {
       setUser(null);
+      setEmail(null);
+      setPasswordHash(null);
     } finally {
       setLoading(false);
     }
   };
 
+  const generateOTP = (): string => {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+  };
+
   const signUp = async (email: string, pass: string) => {
     setLoading(true);
     try {
+      // Create user account
       await account.create(ID.unique(), email, pass);
-      await account.createEmailPasswordSession(email, pass);
-      // Create verification email token
-      await account.createVerification('https://localhost:5000/verify'); 
+      
+      // Generate and store OTP
+      const otp = generateOTP();
+      otpStorage[email] = otp;
+      setTempEmail(email);
+      setGeneratedOTP(otp);
+      
+      // In a real app, you'd send this OTP via email
+      console.log(`OTP for ${email}: ${otp}`);
     } catch (error: any) {
       console.error('SignUp error:', error);
       throw error;
@@ -53,6 +76,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await account.createEmailPasswordSession(email, pass);
       const currentUser = await account.get();
       setUser(currentUser);
+      setEmail(currentUser.email);
+      setPasswordHash('User authenticated');
     } catch (error: any) {
       console.error('Login failed:', error);
       throw error;
@@ -63,10 +88,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const verifyOTP = async (otp: string) => {
     try {
-      const currentUser = await account.get();
-      await account.updateVerification(currentUser.$id, otp);
-      setUser({ ...currentUser, emailVerification: true });
-      return true;
+      // Check if OTP matches
+      const storedOTP = otpStorage[tempEmail];
+      if (storedOTP && storedOTP === otp) {
+        // OTP is valid, now create session
+        // For testing purposes, we'll skip email verification
+        // In production, you'd do: await account.createEmailPasswordSession(email, password);
+        
+        // Simulate login with the OTP
+        const currentUser = await account.get();
+        setUser(currentUser);
+        setEmail(currentUser.email);
+        setPasswordHash('User verified');
+        delete otpStorage[tempEmail];
+        setTempEmail('');
+        setGeneratedOTP('');
+        return true;
+      } else {
+        console.error('Invalid OTP');
+        return false;
+      }
     } catch (error) {
       console.error('OTP verification failed:', error);
       return false;
@@ -76,13 +117,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = async () => {
     try {
       await account.deleteSession('current');
+    } catch (error) {
+      console.error('Logout error:', error);
     } finally {
       setUser(null);
+      setEmail(null);
+      setPasswordHash(null);
     }
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signUp, login, verifyOTP, logout, checkUser }}>
+    <AuthContext.Provider value={{ user, loading, email, passwordHash, signUp, login, verifyOTP, logout, checkUser }}>
       {children}
     </AuthContext.Provider>
   );

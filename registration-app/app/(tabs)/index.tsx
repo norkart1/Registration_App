@@ -6,9 +6,9 @@ export default function HomeScreen() {
   const router = useRouter();
   const { email, passwordHash, logout } = useAuth();
 
-  const handleLogout = () => {
-    logout();
-    router.push('/login');
+  const handleLogout = async () => {
+    await logout();
+    router.replace('/signup');
   };
 
   return (
