@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { hashPassword } from '@/utils/hash';
 import { OtpPopup } from '@/components/OtpPopup';
+import { sendOtpEmail } from '@/utils/email';
 
 export default function SignUpScreen() {
   const router = useRouter();
@@ -33,7 +34,14 @@ export default function SignUpScreen() {
         const hashedPassword = await hashPassword(password);
         setCurrentHash(hashedPassword);
         setPendingCredentials(email, hashedPassword);
-        generateOTP();
+        const otp = generateOTP();
+        
+        // Send actual email
+        const emailResult = await sendOtpEmail(email, otp);
+        if (!emailResult.success) {
+          Alert.alert('Warning', 'Account created but failed to send verification email. Please check your email configuration.');
+        }
+        
         setOtpVisible(true);
       } catch (error) {
         Alert.alert('Error', 'Failed to process registration');
