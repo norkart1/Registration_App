@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text, Pressable, TextInput, ScrollView } from 'react-native';
+import { StyleSheet, View, Text, Pressable, TextInput, ScrollView, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 
@@ -7,10 +7,16 @@ export default function SignUpScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSignUp = () => {
+  const handleSignUp = async () => {
     if (email && password && confirmPassword && password === confirmPassword) {
-      router.push('/(tabs)');
+      setLoading(true);
+      setTimeout(() => {
+        Alert.alert('Success', 'Account created successfully!');
+        router.push('/(tabs)');
+        setLoading(false);
+      }, 1000);
     }
   };
 
@@ -75,12 +81,12 @@ export default function SignUpScreen() {
         <Pressable 
           style={[
             styles.primaryButton,
-            !isFormValid && styles.disabledButton
+            (!isFormValid || loading) && styles.disabledButton
           ]}
           onPress={handleSignUp}
-          disabled={!isFormValid}
+          disabled={!isFormValid || loading}
         >
-          <Text style={styles.primaryButtonText}>Sign up</Text>
+          <Text style={styles.primaryButtonText}>{loading ? 'Creating...' : 'Sign up'}</Text>
         </Pressable>
 
         <Text style={styles.dividerText}>Or sign up with</Text>
