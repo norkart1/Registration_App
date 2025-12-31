@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text, Pressable, TextInput, ScrollView, Alert } from 'react-native';
+import { StyleSheet, View, Text, Pressable, TextInput, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
@@ -17,6 +17,7 @@ export default function SignUpScreen() {
     if (email && password && confirmPassword && password === confirmPassword) {
       try {
         await signUp(email, password);
+        // The popup is now just a placeholder for "Check your email"
         setOtpVisible(true);
       } catch (error: any) {
         Alert.alert('Error', error.message || 'Failed to process registration');
@@ -25,12 +26,17 @@ export default function SignUpScreen() {
   };
 
   const handleVerifyOtp = async (otp: string) => {
-    const isValid = await verifyOTP(otp);
-    if (isValid) {
-      setOtpVisible(false);
-      router.push('/(tabs)');
-      return true;
-    } else {
+    try {
+      const isValid = await verifyOTP(otp);
+      if (isValid) {
+        setOtpVisible(false);
+        router.push('/welcome');
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error: any) {
+      console.error('Verification error:', error);
       return false;
     }
   };
@@ -54,13 +60,12 @@ export default function SignUpScreen() {
               value={email}
               onChangeText={setEmail}
               autoCapitalize="none"
+              editable={!loading}
             />
           </View>
 
           <View style={styles.formGroup}>
-            <View style={styles.passwordHeader}>
-              <Text style={styles.label}>Password</Text>
-            </View>
+            <Text style={styles.label}>Password</Text>
             <View style={styles.passwordContainer}>
               <TextInput
                 style={styles.passwordInput}
@@ -69,6 +74,7 @@ export default function SignUpScreen() {
                 secureTextEntry={!showPassword}
                 value={password}
                 onChangeText={setPassword}
+                editable={!loading}
               />
               <Pressable onPress={() => setShowPassword(!showPassword)}>
                 <Text style={styles.eyeIcon}>{showPassword ? '👁️' : '👁️‍🗨️'}</Text>
@@ -85,6 +91,7 @@ export default function SignUpScreen() {
               secureTextEntry
               value={confirmPassword}
               onChangeText={setConfirmPassword}
+              editable={!loading}
             />
             {confirmPassword && password !== confirmPassword && (
               <Text style={styles.errorText}>Passwords don't match</Text>
@@ -100,7 +107,11 @@ export default function SignUpScreen() {
           onPress={handleSignUp}
           disabled={!isFormValid || loading}
         >
-          <Text style={styles.primaryButtonText}>{loading ? 'Creating...' : 'Sign up'}</Text>
+          {loading ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <Text style={styles.primaryButtonText}>Sign up</Text>
+          )}
         </Pressable>
 
         <View style={styles.loginPrompt}>

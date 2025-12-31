@@ -28,11 +28,11 @@ export const OtpPopup: React.FC<OtpPopupProps> = ({ visible, onClose, onVerify, 
             setIsVerifying(false);
           }, 1500);
         } else {
-          setMessage('Invalid OTP. Please try again.');
+          setMessage('Invalid code. Please check your email and try again.');
           setIsVerifying(false);
         }
-      } catch (error) {
-        setMessage('An error occurred. Please try again.');
+      } catch (error: any) {
+        setMessage(error.message || 'Verification failed. Please try again.');
         setIsVerifying(false);
       }
     }
@@ -47,14 +47,14 @@ export const OtpPopup: React.FC<OtpPopupProps> = ({ visible, onClose, onVerify, 
     >
       <View style={styles.centeredView}>
         <View style={styles.modalView}>
-          <Text style={styles.modalTitle}>Verification Code</Text>
+          <Text style={styles.modalTitle}>Check Your Email</Text>
           <Text style={styles.modalSubtitle}>
-            We've sent a 6-digit code to {email}.
+            We've sent a verification link to {email}. Please click the link in your email to verify your account.
           </Text>
           
           <TextInput
             style={styles.input}
-            placeholder="Enter Code"
+            placeholder="Enter 6-digit code"
             keyboardType="numeric"
             maxLength={6}
             value={otp}
