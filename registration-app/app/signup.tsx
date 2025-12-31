@@ -1,9 +1,11 @@
 import { StyleSheet, View, Text, Pressable, TextInput, ScrollView, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
+import { useAuth } from '@/context/AuthContext';
 
 export default function SignUpScreen() {
   const router = useRouter();
+  const { setPendingCredentials, generateOTP } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -24,8 +26,14 @@ export default function SignUpScreen() {
     if (email && password && confirmPassword && password === confirmPassword) {
       setLoading(true);
       setTimeout(() => {
-        Alert.alert('Success', 'Account created successfully!');
-        router.push('/(tabs)');
+        setPendingCredentials(email, password);
+        const otp = generateOTP();
+        Alert.alert(
+          'Verification Code',
+          `Your OTP is: ${otp}\n\nPlease verify your email address.`,
+          [{ text: 'OK' }]
+        );
+        router.push('/verify-otp');
         setLoading(false);
       }, 1000);
     }
