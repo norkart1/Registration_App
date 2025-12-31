@@ -33,16 +33,13 @@ Preferred communication style: Simple, everyday language.
 - Haptic feedback on tab interactions (iOS only)
 - OTP popup modal for email verification
 
-### Authentication System
+### Email OTP Configuration (Non-Integration)
+- Service: Gmail SMTP (`smtp.gmail.com`)
+- Port: 587 (STARTTLS)
+- From Address: `examples@gmail.com`
+- Credentials: Used `EMAIL_SERVICE_PASS` secret for authentication.
 
-**Password Security**:
-- Uses bcryptjs for client-side password hashing with 10 salt rounds
-- Stores hashed passwords in context (not persisted to backend yet)
-
-**OTP Verification**:
-- 6-digit OTP generated client-side
-- Displayed in console/alert for development (no actual email sending implemented)
-- OTP verified against stored value in AuthContext
+Note: This setup bypasses the Replit Integration system as requested by the user.
 
 **Current Limitations**:
 - No persistent storage - credentials lost on app restart
