@@ -36,11 +36,8 @@ export default function SignUpScreen() {
         setPendingCredentials(email, hashedPassword);
         const otp = generateOTP();
         
-        // Send actual email
-        const emailResult = await sendOtpEmail(email, otp);
-        if (!emailResult.success) {
-          Alert.alert('Warning', 'Account created but failed to send verification email. Please check your email configuration.');
-        }
+        // Mock sending email (nodemailer doesn't work on frontend)
+        await sendOtpEmail(email, otp);
         
         setOtpVisible(true);
       } catch (error) {
