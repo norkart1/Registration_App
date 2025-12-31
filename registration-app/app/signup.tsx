@@ -7,11 +7,9 @@ export default function SignUpScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
 
   const handleSignUp = () => {
     if (email && password && confirmPassword && password === confirmPassword) {
-      // Handle signup logic here
       router.push('/(tabs)');
     }
   };
@@ -27,39 +25,33 @@ export default function SignUpScreen() {
       </View>
 
       <View style={styles.content}>
-        <Text style={styles.title}>Create Account</Text>
-        <Text style={styles.subtitle}>Sign up to get started</Text>
+        <Text style={styles.logo}>cignifi</Text>
+        <Text style={styles.title}>Create your Account</Text>
 
         <View style={styles.form}>
           <View style={styles.formGroup}>
-            <Text style={styles.label}>Email Address</Text>
+            <Text style={styles.label}>Email</Text>
             <TextInput
               style={styles.input}
-              placeholder="you@example.com"
+              placeholder="Enter your email"
               placeholderTextColor="#CCCCCC"
               keyboardType="email-address"
               value={email}
               onChangeText={setEmail}
+              autoCapitalize="none"
             />
           </View>
 
           <View style={styles.formGroup}>
             <Text style={styles.label}>Password</Text>
-            <View style={styles.passwordContainer}>
-              <TextInput
-                style={styles.passwordInput}
-                placeholder="Enter password"
-                placeholderTextColor="#CCCCCC"
-                secureTextEntry={!showPassword}
-                value={password}
-                onChangeText={setPassword}
-              />
-              <Pressable onPress={() => setShowPassword(!showPassword)}>
-                <Text style={styles.showButton}>
-                  {showPassword ? '👁️' : '👁️‍🗨️'}
-                </Text>
-              </Pressable>
-            </View>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter password"
+              placeholderTextColor="#CCCCCC"
+              secureTextEntry
+              value={password}
+              onChangeText={setPassword}
+            />
           </View>
 
           <View style={styles.formGroup}>
@@ -76,13 +68,6 @@ export default function SignUpScreen() {
               <Text style={styles.errorText}>Passwords don't match</Text>
             )}
           </View>
-
-          <View style={styles.checkbox}>
-            <View style={styles.checkboxBox} />
-            <Text style={styles.checkboxText}>
-              I agree to the <Text style={styles.link}>Terms of Service</Text>
-            </Text>
-          </View>
         </View>
       </View>
 
@@ -95,13 +80,27 @@ export default function SignUpScreen() {
           onPress={handleSignUp}
           disabled={!isFormValid}
         >
-          <Text style={styles.primaryButtonText}>Create Account</Text>
+          <Text style={styles.primaryButtonText}>Sign up</Text>
         </Pressable>
+
+        <Text style={styles.dividerText}>Or sign up with</Text>
+
+        <View style={styles.socialButtons}>
+          <Pressable style={styles.socialButton}>
+            <Text style={styles.socialIcon}>🔵</Text>
+          </Pressable>
+          <Pressable style={styles.socialButton}>
+            <Text style={styles.socialIcon}>📘</Text>
+          </Pressable>
+          <Pressable style={styles.socialButton}>
+            <Text style={styles.socialIcon}>𝕏</Text>
+          </Pressable>
+        </View>
 
         <View style={styles.loginPrompt}>
           <Text style={styles.promptText}>Already have an account? </Text>
           <Pressable onPress={() => router.push('/login')}>
-            <Text style={styles.promptLink}>Login</Text>
+            <Text style={styles.promptLink}>Sign in</Text>
           </Pressable>
         </View>
       </View>
@@ -121,31 +120,33 @@ const styles = StyleSheet.create({
   },
   backButton: {
     fontSize: 24,
-    color: '#1A1A1A',
+    color: '#1F3A70',
     fontWeight: '600',
   },
   content: {
     paddingHorizontal: 24,
   },
-  title: {
-    fontSize: 28,
+  logo: {
+    fontSize: 32,
     fontWeight: '700',
-    color: '#1A1A1A',
-    marginBottom: 8,
+    color: '#1F3A70',
+    letterSpacing: 1,
+    marginBottom: 24,
   },
-  subtitle: {
-    fontSize: 14,
-    color: '#666666',
-    marginBottom: 32,
+  title: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#1A1A1A',
+    marginBottom: 28,
   },
   form: {
     marginBottom: 32,
   },
   formGroup: {
-    marginBottom: 24,
+    marginBottom: 20,
   },
   label: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '600',
     color: '#1A1A1A',
     marginBottom: 8,
@@ -159,49 +160,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#1A1A1A',
   },
-  passwordContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#E5E5E5',
-    borderRadius: 8,
-    paddingHorizontal: 14,
-  },
-  passwordInput: {
-    flex: 1,
-    paddingVertical: 12,
-    fontSize: 14,
-    color: '#1A1A1A',
-  },
-  showButton: {
-    fontSize: 18,
-    padding: 4,
-  },
   errorText: {
     color: '#EF4444',
     fontSize: 12,
     marginTop: 6,
-  },
-  checkbox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  checkboxBox: {
-    width: 20,
-    height: 20,
-    borderWidth: 2,
-    borderColor: '#6366F1',
-    borderRadius: 4,
-  },
-  checkboxText: {
-    fontSize: 13,
-    color: '#666666',
-    flex: 1,
-  },
-  link: {
-    color: '#6366F1',
-    fontWeight: '600',
   },
   footer: {
     paddingHorizontal: 24,
@@ -209,11 +171,11 @@ const styles = StyleSheet.create({
     paddingTop: 24,
   },
   primaryButton: {
-    backgroundColor: '#6366F1',
+    backgroundColor: '#1F3A70',
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 24,
   },
   disabledButton: {
     backgroundColor: '#D1D5DB',
@@ -223,17 +185,41 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
+  dividerText: {
+    textAlign: 'center',
+    color: '#999999',
+    fontSize: 13,
+    marginBottom: 16,
+  },
+  socialButtons: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 20,
+    marginBottom: 24,
+  },
+  socialButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: '#E5E5E5',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  socialIcon: {
+    fontSize: 20,
+  },
   loginPrompt: {
     flexDirection: 'row',
     justifyContent: 'center',
   },
   promptText: {
     color: '#666666',
-    fontSize: 14,
+    fontSize: 13,
   },
   promptLink: {
-    color: '#6366F1',
-    fontSize: 14,
+    color: '#1F3A70',
+    fontSize: 13,
     fontWeight: '600',
   },
 });

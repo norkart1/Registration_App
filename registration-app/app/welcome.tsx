@@ -13,8 +13,9 @@ export default function WelcomeScreen() {
       </View>
 
       <View style={styles.content}>
+        <Text style={styles.logo}>cignifi</Text>
         <Text style={styles.title}>Welcome!</Text>
-        <Text style={styles.subtitle}>Let's get you set up</Text>
+        <Text style={styles.subtitle}>Let's get you started</Text>
 
         <View style={styles.stepsContainer}>
           <View style={styles.stepItem}>
@@ -23,7 +24,7 @@ export default function WelcomeScreen() {
             </View>
             <View style={styles.stepContent}>
               <Text style={styles.stepTitle}>Create Profile</Text>
-              <Text style={styles.stepDesc}>Set up your account details</Text>
+              <Text style={styles.stepDesc}>Set up your account</Text>
             </View>
           </View>
 
@@ -33,7 +34,7 @@ export default function WelcomeScreen() {
             </View>
             <View style={styles.stepContent}>
               <Text style={styles.stepTitle}>Verify Email</Text>
-              <Text style={styles.stepDesc}>Confirm your email address</Text>
+              <Text style={styles.stepDesc}>Confirm your email</Text>
             </View>
           </View>
 
@@ -42,19 +43,16 @@ export default function WelcomeScreen() {
               <Text style={styles.stepNumberText}>3</Text>
             </View>
             <View style={styles.stepContent}>
-              <Text style={styles.stepTitle}>Start Exploring</Text>
-              <Text style={styles.stepDesc}>Find things you love</Text>
+              <Text style={styles.stepTitle}>Get Started</Text>
+              <Text style={styles.stepDesc}>Start exploring</Text>
             </View>
           </View>
         </View>
       </View>
 
-      <View style={styles.buttonContainer}>
+      <View style={styles.footer}>
         <Pressable 
-          style={({ pressed }) => [
-            styles.primaryButton,
-            pressed && styles.buttonPressed
-          ]}
+          style={styles.primaryButton}
           onPress={() => router.push('/signup')}
         >
           <Text style={styles.primaryButtonText}>Sign Up</Text>
@@ -76,12 +74,19 @@ const styles = StyleSheet.create({
   },
   backButton: {
     fontSize: 24,
-    color: '#1A1A1A',
+    color: '#1F3A70',
     fontWeight: '600',
   },
   content: {
     flex: 1,
     paddingHorizontal: 24,
+  },
+  logo: {
+    fontSize: 32,
+    fontWeight: '700',
+    color: '#1F3A70',
+    letterSpacing: 1,
+    marginBottom: 24,
   },
   title: {
     fontSize: 28,
@@ -105,7 +110,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#6366F1',
+    backgroundColor: '#1F3A70',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -128,19 +133,16 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#999999',
   },
-  buttonContainer: {
+  footer: {
     paddingHorizontal: 24,
     paddingBottom: 32,
     paddingTop: 24,
   },
   primaryButton: {
-    backgroundColor: '#6366F1',
+    backgroundColor: '#1F3A70',
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
-  },
-  buttonPressed: {
-    opacity: 0.8,
   },
   primaryButtonText: {
     color: '#FFFFFF',
