@@ -6,6 +6,7 @@ export default function LoginScreen() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
@@ -30,7 +31,7 @@ export default function LoginScreen() {
       </View>
 
       <View style={styles.content}>
-        <Text style={styles.logo}>cignifi</Text>
+        <Text style={styles.logo}>NorkCraft</Text>
         <Text style={styles.title}>Login to your Account</Text>
 
         <View style={styles.form}>
@@ -48,15 +49,22 @@ export default function LoginScreen() {
           </View>
 
           <View style={styles.formGroup}>
-            <Text style={styles.label}>Password</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter your password"
-              placeholderTextColor="#CCCCCC"
-              secureTextEntry
-              value={password}
-              onChangeText={setPassword}
-            />
+            <View style={styles.passwordHeader}>
+              <Text style={styles.label}>Password</Text>
+            </View>
+            <View style={styles.passwordContainer}>
+              <TextInput
+                style={styles.passwordInput}
+                placeholder="Enter your password"
+                placeholderTextColor="#CCCCCC"
+                secureTextEntry={!showPassword}
+                value={password}
+                onChangeText={setPassword}
+              />
+              <Pressable onPress={() => setShowPassword(!showPassword)}>
+                <Text style={styles.eyeIcon}>{showPassword ? '👁️' : '👁️‍🗨️'}</Text>
+              </Pressable>
+            </View>
           </View>
         </View>
       </View>
@@ -73,24 +81,10 @@ export default function LoginScreen() {
           <Text style={styles.primaryButtonText}>{loading ? 'Signing in...' : 'Sign in'}</Text>
         </Pressable>
 
-        <Text style={styles.dividerText}>Or sign up with</Text>
-
-        <View style={styles.socialButtons}>
-          <Pressable style={styles.socialButton}>
-            <Text style={styles.socialIcon}>🔵</Text>
-          </Pressable>
-          <Pressable style={styles.socialButton}>
-            <Text style={styles.socialIcon}>📘</Text>
-          </Pressable>
-          <Pressable style={styles.socialButton}>
-            <Text style={styles.socialIcon}>𝕏</Text>
-          </Pressable>
-        </View>
-
         <View style={styles.signupPrompt}>
           <Text style={styles.promptText}>Don't have an account? </Text>
           <Pressable onPress={() => router.push('/signup')}>
-            <Text style={styles.promptLink}>Sign up</Text>
+            <Text style={styles.promptLink}>Sign Up</Text>
           </Pressable>
         </View>
       </View>
@@ -141,6 +135,12 @@ const styles = StyleSheet.create({
     color: '#1A1A1A',
     marginBottom: 8,
   },
+  passwordHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
   input: {
     borderWidth: 1,
     borderColor: '#E5E5E5',
@@ -149,6 +149,24 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     fontSize: 14,
     color: '#1A1A1A',
+  },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E5E5E5',
+    borderRadius: 8,
+    paddingHorizontal: 14,
+  },
+  passwordInput: {
+    flex: 1,
+    paddingVertical: 12,
+    fontSize: 14,
+    color: '#1A1A1A',
+  },
+  eyeIcon: {
+    fontSize: 18,
+    padding: 4,
   },
   footer: {
     paddingHorizontal: 24,
@@ -169,30 +187,6 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
-  },
-  dividerText: {
-    textAlign: 'center',
-    color: '#999999',
-    fontSize: 13,
-    marginBottom: 16,
-  },
-  socialButtons: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 20,
-    marginBottom: 24,
-  },
-  socialButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    borderWidth: 1,
-    borderColor: '#E5E5E5',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  socialIcon: {
-    fontSize: 20,
   },
   signupPrompt: {
     flexDirection: 'row',

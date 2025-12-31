@@ -13,7 +13,7 @@ export default function WelcomeScreen() {
       </View>
 
       <View style={styles.content}>
-        <Text style={styles.logo}>cignifi</Text>
+        <Text style={styles.logo}>NorkCraft</Text>
         <Text style={styles.title}>Welcome!</Text>
         <Text style={styles.subtitle}>Let's get you started</Text>
 

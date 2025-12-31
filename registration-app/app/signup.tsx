@@ -7,7 +7,18 @@ export default function SignUpScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const generatePassword = () => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%';
+    let pass = '';
+    for (let i = 0; i < 12; i++) {
+      pass += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    setPassword(pass);
+    setConfirmPassword(pass);
+  };
 
   const handleSignUp = async () => {
     if (email && password && confirmPassword && password === confirmPassword) {
@@ -31,7 +42,7 @@ export default function SignUpScreen() {
       </View>
 
       <View style={styles.content}>
-        <Text style={styles.logo}>cignifi</Text>
+        <Text style={styles.logo}>NorkCraft</Text>
         <Text style={styles.title}>Create your Account</Text>
 
         <View style={styles.form}>
@@ -49,15 +60,25 @@ export default function SignUpScreen() {
           </View>
 
           <View style={styles.formGroup}>
-            <Text style={styles.label}>Password</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter password"
-              placeholderTextColor="#CCCCCC"
-              secureTextEntry
-              value={password}
-              onChangeText={setPassword}
-            />
+            <View style={styles.passwordHeader}>
+              <Text style={styles.label}>Password</Text>
+              <Pressable onPress={generatePassword}>
+                <Text style={styles.suggestLink}>Suggest</Text>
+              </Pressable>
+            </View>
+            <View style={styles.passwordContainer}>
+              <TextInput
+                style={styles.passwordInput}
+                placeholder="Enter password"
+                placeholderTextColor="#CCCCCC"
+                secureTextEntry={!showPassword}
+                value={password}
+                onChangeText={setPassword}
+              />
+              <Pressable onPress={() => setShowPassword(!showPassword)}>
+                <Text style={styles.eyeIcon}>{showPassword ? '👁️' : '👁️‍🗨️'}</Text>
+              </Pressable>
+            </View>
           </View>
 
           <View style={styles.formGroup}>
@@ -88,20 +109,6 @@ export default function SignUpScreen() {
         >
           <Text style={styles.primaryButtonText}>{loading ? 'Creating...' : 'Sign up'}</Text>
         </Pressable>
-
-        <Text style={styles.dividerText}>Or sign up with</Text>
-
-        <View style={styles.socialButtons}>
-          <Pressable style={styles.socialButton}>
-            <Text style={styles.socialIcon}>🔵</Text>
-          </Pressable>
-          <Pressable style={styles.socialButton}>
-            <Text style={styles.socialIcon}>📘</Text>
-          </Pressable>
-          <Pressable style={styles.socialButton}>
-            <Text style={styles.socialIcon}>𝕏</Text>
-          </Pressable>
-        </View>
 
         <View style={styles.loginPrompt}>
           <Text style={styles.promptText}>Already have an account? </Text>
@@ -157,6 +164,17 @@ const styles = StyleSheet.create({
     color: '#1A1A1A',
     marginBottom: 8,
   },
+  passwordHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  suggestLink: {
+    color: '#1F3A70',
+    fontSize: 12,
+    fontWeight: '600',
+  },
   input: {
     borderWidth: 1,
     borderColor: '#E5E5E5',
@@ -165,6 +183,24 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     fontSize: 14,
     color: '#1A1A1A',
+  },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E5E5E5',
+    borderRadius: 8,
+    paddingHorizontal: 14,
+  },
+  passwordInput: {
+    flex: 1,
+    paddingVertical: 12,
+    fontSize: 14,
+    color: '#1A1A1A',
+  },
+  eyeIcon: {
+    fontSize: 18,
+    padding: 4,
   },
   errorText: {
     color: '#EF4444',
@@ -181,7 +217,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: 16,
   },
   disabledButton: {
     backgroundColor: '#D1D5DB',
@@ -190,30 +226,6 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
-  },
-  dividerText: {
-    textAlign: 'center',
-    color: '#999999',
-    fontSize: 13,
-    marginBottom: 16,
-  },
-  socialButtons: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 20,
-    marginBottom: 24,
-  },
-  socialButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    borderWidth: 1,
-    borderColor: '#E5E5E5',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  socialIcon: {
-    fontSize: 20,
   },
   loginPrompt: {
     flexDirection: 'row',
