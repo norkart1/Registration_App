@@ -17,6 +17,7 @@ export const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 // Simple OTP storage (in production, this would come from backend)
 const otpStorage: { [key: string]: string } = {};
+const userPasswords: { [key: string]: string } = {};
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<any | null>(null);
@@ -35,6 +36,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const currentUser = await account.get();
       setUser(currentUser);
       setEmail(currentUser.email);
+      setPasswordHash('User authenticated');
     } catch (error) {
       setUser(null);
       setEmail(null);
@@ -51,8 +53,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signUp = async (email: string, pass: string) => {
     setLoading(true);
     try {
-      // Create user account
+      // Create user account in Appwrite
       await account.create(ID.unique(), email, pass);
+      
+      // Store password for MongoDB (hashing will happen in the API)
+      userPasswords[email] = pass;
       
       // Generate and store OTP
       const otp = generateOTP();
@@ -60,8 +65,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setTempEmail(email);
       setGeneratedOTP(otp);
       
-      // In a real app, you'd send this OTP via email
       console.log(`OTP for ${email}: ${otp}`);
+      console.log(`User password stored: ${email}`);
     } catch (error: any) {
       console.error('SignUp error:', error);
       throw error;
@@ -91,16 +96,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Check if OTP matches
       const storedOTP = otpStorage[tempEmail];
       if (storedOTP && storedOTP === otp) {
-        // OTP is valid, now create session
-        // For testing purposes, we'll skip email verification
-        // In production, you'd do: await account.createEmailPasswordSession(email, password);
+        // OTP is valid - save user data to MongoDB via API
+        try {
+          const response = await fetch('/api/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: tempEmail,
+              password: userPasswords[tempEmail],
+            }),
+          });
+          
+          if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Failed to save user data');
+          }
+        } catch (apiError) {
+          console.warn('MongoDB save warning:', apiError);
+        }
         
-        // Simulate login with the OTP
+        // Get current user and set as authenticated
         const currentUser = await account.get();
         setUser(currentUser);
         setEmail(currentUser.email);
         setPasswordHash('User verified');
+        
+        // Cleanup
         delete otpStorage[tempEmail];
+        delete userPasswords[tempEmail];
         setTempEmail('');
         setGeneratedOTP('');
         return true;
