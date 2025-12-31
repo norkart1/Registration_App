@@ -19,15 +19,17 @@ const transporter = nodemailer.createTransport({
 
 app.post('/send-otp', async (req, res) => {
   const { to, otp } = req.body;
+  console.log(`Attempting to send OTP to: ${to}`);
 
   try {
-    await transporter.sendMail({
+    const info = await transporter.sendMail({
       from: `"NorkCraft Auth" <${process.env.EMAIL_SERVICE_USER || 'examples@gmail.com'}>`,
       to,
       subject: 'Your Verification Code',
       text: `Your verification code is: ${otp}`,
       html: `<b>Your verification code is: ${otp}</b>`,
     });
+    console.log('Email sent: %s', info.messageId);
     res.status(200).json({ success: true });
   } catch (error) {
     console.error('Error sending email:', error);

@@ -35,9 +35,13 @@ export default function SignUpScreen() {
         setCurrentHash(hashedPassword);
         setPendingCredentials(email, hashedPassword);
         const otp = generateOTP();
+        console.log(`Generated OTP: ${otp} for ${email}`);
         
-        // Mock sending email (nodemailer doesn't work on frontend)
-        await sendOtpEmail(email, otp);
+        const result = await sendOtpEmail(email, otp);
+        if (!result.success) {
+          Alert.alert('Error', `Failed to send verification email: ${result.error}`);
+          return;
+        }
         
         setOtpVisible(true);
       } catch (error) {

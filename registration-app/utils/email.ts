@@ -10,12 +10,17 @@ export const sendOtpEmail = async (to: string, otp: string) => {
       body: JSON.stringify({ to, otp }),
     });
     
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Server responded with ${response.status}: ${errorText}`);
+    }
+    
     const result = await response.json();
     return result;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error sending OTP through backend:', error);
     // Fallback to mock for development if backend fails
     console.log(`[DEV FALLBACK] OTP ${otp} for ${to}`);
-    return { success: false, error: error.message };
+    return { success: false, error: error.message || 'Unknown error' };
   }
 };
