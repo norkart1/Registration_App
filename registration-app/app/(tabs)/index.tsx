@@ -1,31 +1,33 @@
 import { StyleSheet, View, Text, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 
-export default function IntroScreen() {
+export default function SplashScreen() {
   const router = useRouter();
-
-  const handleContinue = () => {
-    router.push('/welcome');
-  };
 
   return (
     <View style={styles.container}>
-      <View style={styles.card}>
-        <View style={styles.header} />
+      <View style={styles.content}>
+        <View style={styles.logoContainer}>
+          <Text style={styles.logo}>✨</Text>
+        </View>
         
-        <View style={styles.contentContainer}>
-          <View style={styles.birdContainer}>
-            <Text style={styles.bird}>🦜</Text>
-          </View>
-          
-          <Pressable 
-            style={({ pressed }) => [
-              styles.button,
-              pressed && styles.buttonPressed
-            ]}
-            onPress={handleContinue}
-          >
-            <Text style={styles.buttonText}>Continue</Text>
+        <Text style={styles.title}>Create Account</Text>
+        <Text style={styles.subtitle}>Join our community today</Text>
+        
+        <Pressable 
+          style={({ pressed }) => [
+            styles.primaryButton,
+            pressed && styles.buttonPressed
+          ]}
+          onPress={() => router.push('/welcome')}
+        >
+          <Text style={styles.primaryButtonText}>Get Started</Text>
+        </Pressable>
+        
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>Already have an account? </Text>
+          <Pressable onPress={() => router.push('/login')}>
+            <Text style={styles.footerLink}>Login</Text>
           </Pressable>
         </View>
       </View>
@@ -36,58 +38,65 @@ export default function IntroScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
-    backgroundColor: '#18998C',
+    paddingHorizontal: 24,
   },
-  card: {
+  content: {
     width: '100%',
-    maxWidth: 400,
-    backgroundColor: '#F5F5F5',
-    borderRadius: 30,
-    overflow: 'hidden',
-    elevation: 10,
-    shadowColor: '#000',
-    shadowOpacity: 0.15,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 5 },
-  },
-  header: {
-    height: 100,
-    backgroundColor: '#B8F3F8',
-    borderBottomLeftRadius: 50,
-    borderBottomRightRadius: 50,
-  },
-  contentContainer: {
     alignItems: 'center',
-    paddingVertical: 60,
-    paddingHorizontal: 20,
   },
-  birdContainer: {
-    width: 180,
-    height: 180,
+  logoContainer: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: '#F0F4FF',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 30,
+    marginBottom: 40,
   },
-  bird: {
-    fontSize: 120,
+  logo: {
+    fontSize: 50,
   },
-  button: {
-    backgroundColor: '#5AC8BD',
+  title: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: '#1A1A1A',
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: '#666666',
+    marginBottom: 40,
+  },
+  primaryButton: {
+    width: '100%',
+    backgroundColor: '#6366F1',
     paddingVertical: 14,
-    paddingHorizontal: 60,
-    borderRadius: 25,
-    marginTop: 20,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 24,
   },
   buttonPressed: {
     opacity: 0.8,
   },
-  buttonText: {
+  primaryButtonText: {
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
-    textAlign: 'center',
+  },
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  footerText: {
+    color: '#666666',
+    fontSize: 14,
+  },
+  footerLink: {
+    color: '#6366F1',
+    fontSize: 14,
+    fontWeight: '600',
   },
 });
