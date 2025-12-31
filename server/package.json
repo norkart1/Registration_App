@@ -7,13 +7,20 @@
     "start": "node src/index.js",
     "dev": "node src/index.js"
   },
-  "keywords": ["email", "otp", "norkcraft"],
+  "keywords": [
+    "email",
+    "otp",
+    "norkcraft"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.18.2",
-    "nodemailer": "^6.9.7",
+    "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
-    "dotenv": "^16.3.1"
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "joi": "^17.13.3",
+    "mongoose": "^7.8.8",
+    "nodemailer": "^6.9.7"
   }
 }
