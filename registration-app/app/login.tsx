@@ -23,14 +23,8 @@ export default function LoginScreen() {
   const isFormValid = email && password;
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <Pressable onPress={() => router.back()}>
-          <Text style={styles.backButton}>←</Text>
-        </Pressable>
-      </View>
-
-      <View style={styles.content}>
+    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
+      <View style={styles.card}>
         <Text style={styles.logo}>NorkCraft</Text>
         <Text style={styles.title}>Login to your Account</Text>
 
@@ -49,9 +43,7 @@ export default function LoginScreen() {
           </View>
 
           <View style={styles.formGroup}>
-            <View style={styles.passwordHeader}>
-              <Text style={styles.label}>Password</Text>
-            </View>
+            <Text style={styles.label}>Password</Text>
             <View style={styles.passwordContainer}>
               <TextInput
                 style={styles.passwordInput}
@@ -67,9 +59,7 @@ export default function LoginScreen() {
             </View>
           </View>
         </View>
-      </View>
 
-      <View style={styles.footer}>
         <Pressable 
           style={[
             styles.primaryButton,
@@ -84,7 +74,7 @@ export default function LoginScreen() {
         <View style={styles.signupPrompt}>
           <Text style={styles.promptText}>Don't have an account? </Text>
           <Pressable onPress={() => router.push('/signup')}>
-            <Text style={styles.promptLink}>Sign Up</Text>
+            <Text style={styles.promptLink}>Sign in</Text>
           </Pressable>
         </View>
       </View>
@@ -95,22 +85,24 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#E8ECFF',
   },
-  header: {
-    paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 24,
-  },
-  backButton: {
-    fontSize: 24,
-    color: '#1F3A70',
-    fontWeight: '600',
-  },
-  content: {
-    paddingHorizontal: 24,
+  scrollContent: {
     paddingVertical: 40,
+    paddingHorizontal: 20,
+    justifyContent: 'center',
+    minHeight: '100%',
+  },
+  card: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 24,
+    padding: 32,
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 5,
   },
   logo: {
     fontSize: 32,
@@ -173,17 +165,13 @@ const styles = StyleSheet.create({
     fontSize: 18,
     padding: 4,
   },
-  footer: {
-    paddingHorizontal: 24,
-    paddingBottom: 32,
-    paddingTop: 24,
-  },
   primaryButton: {
+    width: '100%',
     backgroundColor: '#1F3A70',
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: 20,
   },
   disabledButton: {
     backgroundColor: '#D1D5DB',
@@ -193,12 +181,38 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
+  dividerText: {
+    color: '#999999',
+    fontSize: 12,
+    marginBottom: 16,
+  },
+  socialContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 16,
+    marginBottom: 24,
+  },
+  socialButton: {
+    width: 50,
+    height: 50,
+    borderRadius: 12,
+    backgroundColor: '#F5F5F5',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E5E5E5',
+  },
+  socialIcon: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#666666',
+  },
   signupPrompt: {
     flexDirection: 'row',
     justifyContent: 'center',
   },
   promptText: {
-    color: '#666666',
+    color: '#999999',
     fontSize: 13,
   },
   promptLink: {
