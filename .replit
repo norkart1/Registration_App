@@ -21,6 +21,10 @@ author = "agent"
 task = "workflow.run"
 args = "registration-app-web"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "otp-backend-server"
+
 [[workflows.workflow]]
 name = "registration-app-web"
 author = "agent"
@@ -32,6 +36,22 @@ outputType = "webview"
 task = "shell.exec"
 args = "cd registration-app && npm run web -- --port 5000"
 waitForPort = 5000
+
+[[workflows.workflow]]
+name = "otp-backend-server"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd server && node index.js"
+waitForPort = 3001
+
+[workflows.workflow.metadata]
+outputType = "console"
+
+[[ports]]
+localPort = 3001
+externalPort = 3001
 
 [[ports]]
 localPort = 5000

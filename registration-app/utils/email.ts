@@ -1,7 +1,21 @@
-// This utility is a no-op on the frontend because nodemailer is a Node.js-only library.
-// For a production app, this logic should move to a backend server.
-
 export const sendOtpEmail = async (to: string, otp: string) => {
-  console.log(`[DEV] Mock sending OTP ${otp} to ${to}`);
-  return { success: true };
+  try {
+    // In Replit, the backend is on a different port but shared domain
+    // We use the proxy URL for the backend
+    const response = await fetch('http://localhost:3001/send-otp', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ to, otp }),
+    });
+    
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error('Error sending OTP through backend:', error);
+    // Fallback to mock for development if backend fails
+    console.log(`[DEV FALLBACK] OTP ${otp} for ${to}`);
+    return { success: false, error: error.message };
+  }
 };
