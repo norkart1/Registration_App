@@ -109,22 +109,27 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingHorizontal: 24,
+    paddingVertical: 40,
+    alignItems: 'center',
   },
   logo: {
     fontSize: 32,
     fontWeight: '700',
     color: '#1F3A70',
     letterSpacing: 1,
-    marginBottom: 24,
+    marginBottom: 8,
+    textAlign: 'center',
   },
   title: {
     fontSize: 18,
     fontWeight: '600',
     color: '#1A1A1A',
-    marginBottom: 28,
+    marginBottom: 32,
+    textAlign: 'center',
   },
   form: {
     marginBottom: 32,
+    width: '100%',
   },
   formGroup: {
     marginBottom: 20,
