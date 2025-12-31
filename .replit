@@ -26,20 +26,16 @@ name = "registration-app-web"
 author = "agent"
 
 [workflows.workflow.metadata]
-outputType = "console"
+outputType = "webview"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "cd registration-app && PORT=8080 npm run web"
-waitForPort = 8080
+args = "cd registration-app && npm run web -- --port 5000"
+waitForPort = 5000
 
 [[ports]]
 localPort = 5000
 externalPort = 80
-
-[[ports]]
-localPort = 8081
-externalPort = 8081
 
 [[ports]]
 localPort = 8080
