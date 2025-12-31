@@ -1,13 +1,14 @@
 import React, { createContext, useState, ReactNode } from 'react';
+import { hashPassword } from '@/utils/hash';
 
 interface AuthContextType {
   email: string | null;
-  password: string | null;
+  passwordHash: string | null;
   pendingEmail: string | null;
-  pendingPassword: string | null;
+  pendingPasswordHash: string | null;
   otp: string | null;
-  setCredentials: (email: string, password: string) => void;
-  setPendingCredentials: (email: string, password: string) => void;
+  setCredentials: (email: string, passwordHash: string) => void;
+  setPendingCredentials: (email: string, passwordHash: string) => void;
   generateOTP: () => string;
   verifyOTP: (inputOtp: string) => boolean;
   clearOTP: () => void;
@@ -18,22 +19,22 @@ export const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [email, setEmail] = useState<string | null>(null);
-  const [password, setPassword] = useState<string | null>(null);
+  const [passwordHash, setPasswordHash] = useState<string | null>(null);
   const [pendingEmail, setPendingEmail] = useState<string | null>(null);
-  const [pendingPassword, setPendingPassword] = useState<string | null>(null);
+  const [pendingPasswordHash, setPendingPasswordHash] = useState<string | null>(null);
   const [otp, setOtp] = useState<string | null>(null);
 
-  const setCredentials = (newEmail: string, newPassword: string) => {
+  const setCredentials = (newEmail: string, newPasswordHash: string) => {
     setEmail(newEmail);
-    setPassword(newPassword);
+    setPasswordHash(newPasswordHash);
     setPendingEmail(null);
-    setPendingPassword(null);
+    setPendingPasswordHash(null);
     setOtp(null);
   };
 
-  const setPendingCredentials = (newEmail: string, newPassword: string) => {
+  const setPendingCredentials = (newEmail: string, newPasswordHash: string) => {
     setPendingEmail(newEmail);
-    setPendingPassword(newPassword);
+    setPendingPasswordHash(newPasswordHash);
   };
 
   const generateOTP = () => {
@@ -49,12 +50,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const clearOTP = () => {
     setOtp(null);
     setPendingEmail(null);
-    setPendingPassword(null);
+    setPendingPasswordHash(null);
   };
 
   const logout = () => {
     setEmail(null);
-    setPassword(null);
+    setPasswordHash(null);
     setOtp(null);
   };
 
@@ -62,9 +63,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     <AuthContext.Provider 
       value={{ 
         email, 
-        password, 
+        passwordHash, 
         pendingEmail,
-        pendingPassword,
+        pendingPasswordHash,
         otp,
         setCredentials, 
         setPendingCredentials,

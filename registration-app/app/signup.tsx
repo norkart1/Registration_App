@@ -2,15 +2,19 @@ import { StyleSheet, View, Text, Pressable, TextInput, ScrollView, Alert } from 
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import { hashPassword } from '@/utils/hash';
+import { OtpPopup } from '@/components/OtpPopup';
 
 export default function SignUpScreen() {
   const router = useRouter();
-  const { setPendingCredentials, generateOTP } = useAuth();
+  const { setPendingCredentials, generateOTP, verifyOTP, setCredentials } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [otpVisible, setOtpVisible] = useState(false);
+  const [currentHash, setCurrentHash] = useState('');
 
   const generatePassword = () => {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%';
@@ -25,17 +29,27 @@ export default function SignUpScreen() {
   const handleSignUp = async () => {
     if (email && password && confirmPassword && password === confirmPassword) {
       setLoading(true);
-      setTimeout(() => {
-        setPendingCredentials(email, password);
-        const otp = generateOTP();
-        Alert.alert(
-          'Verification Code',
-          `Your OTP is: ${otp}\n\nPlease verify your email address.`,
-          [{ text: 'OK' }]
-        );
-        router.push('/verify-otp');
+      try {
+        const hashedPassword = await hashPassword(password);
+        setCurrentHash(hashedPassword);
+        setPendingCredentials(email, hashedPassword);
+        generateOTP();
+        setOtpVisible(true);
+      } catch (error) {
+        Alert.alert('Error', 'Failed to process registration');
+      } finally {
         setLoading(false);
-      }, 1000);
+      }
+    }
+  };
+
+  const handleVerifyOtp = (otp: string) => {
+    if (verifyOTP(otp)) {
+      setCredentials(email, currentHash);
+      setOtpVisible(false);
+      router.push('/(tabs)');
+    } else {
+      Alert.alert('Error', 'Invalid verification code');
     }
   };
 
@@ -117,6 +131,13 @@ export default function SignUpScreen() {
           </Pressable>
         </View>
       </View>
+
+      <OtpPopup
+        visible={otpVisible}
+        email={email}
+        onClose={() => setOtpVisible(false)}
+        onVerify={handleVerifyOtp}
+      />
     </ScrollView>
   );
 }

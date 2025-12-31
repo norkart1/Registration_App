@@ -2,10 +2,11 @@ import { StyleSheet, View, Text, Pressable, TextInput, ScrollView, Alert } from 
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import { comparePassword } from '@/utils/hash';
 
 export default function LoginScreen() {
   const router = useRouter();
-  const { setCredentials } = useAuth();
+  const { email: savedEmail, passwordHash: savedHash } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -14,12 +15,22 @@ export default function LoginScreen() {
   const handleLogin = async () => {
     if (email && password) {
       setLoading(true);
-      setTimeout(() => {
-        setCredentials(email, password);
-        Alert.alert('Success', 'Login successful!');
-        router.push('/(tabs)');
+      try {
+        if (email === savedEmail && savedHash) {
+          const isValid = await comparePassword(password, savedHash);
+          if (isValid) {
+            router.push('/(tabs)');
+          } else {
+            Alert.alert('Error', 'Invalid email or password');
+          }
+        } else {
+          Alert.alert('Error', 'User not found');
+        }
+      } catch (error) {
+        Alert.alert('Error', 'Login failed');
+      } finally {
         setLoading(false);
-      }, 1000);
+      }
     }
   };
 

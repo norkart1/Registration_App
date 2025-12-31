@@ -4,7 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { email, password, logout } = useAuth();
+  const { email, passwordHash, logout } = useAuth();
 
   const handleLogout = () => {
     logout();
@@ -26,9 +26,9 @@ export default function HomeScreen() {
           </View>
 
           <View style={styles.detailGroup}>
-            <Text style={styles.detailLabel}>Password</Text>
+            <Text style={styles.detailLabel}>Password Hash</Text>
             <View style={styles.detailBox}>
-              <Text style={styles.detailValue}>{'•'.repeat(password?.length || 0) || 'Not available'}</Text>
+              <Text style={styles.detailValue}>{passwordHash || 'Not available'}</Text>
             </View>
           </View>
         </View>
