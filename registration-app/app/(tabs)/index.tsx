@@ -1,8 +1,17 @@
-import { StyleSheet, View, Text, Pressable } from 'react-native';
+import { StyleSheet, View, Text } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useEffect } from 'react';
 
 export default function SplashScreen() {
   const router = useRouter();
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      router.push('/welcome');
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [router]);
 
   return (
     <View style={styles.container}>
