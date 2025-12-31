@@ -10,7 +10,7 @@ interface AuthContextType {
   setCredentials: (email: string, passwordHash: string) => void;
   setPendingCredentials: (email: string, passwordHash: string) => void;
   generateOTP: () => string;
-  verifyOTP: (inputOtp: string) => boolean;
+  verifyOTP: (inputOtp: string) => Promise<boolean>;
   clearOTP: () => void;
   logout: () => void;
 }
@@ -43,7 +43,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return generatedOtp;
   };
 
-  const verifyOTP = (inputOtp: string) => {
+  const verifyOTP = async (inputOtp: string) => {
     return otp === inputOtp;
   };
 

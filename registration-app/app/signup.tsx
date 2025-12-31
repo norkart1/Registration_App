@@ -48,13 +48,15 @@ export default function SignUpScreen() {
     }
   };
 
-  const handleVerifyOtp = (otp: string) => {
-    if (verifyOTP(otp)) {
+  const handleVerifyOtp = async (otp: string) => {
+    const isValid = await verifyOTP(otp);
+    if (isValid) {
       setCredentials(email, currentHash);
       setOtpVisible(false);
       router.push('/(tabs)');
+      return true;
     } else {
-      Alert.alert('Error', 'Invalid verification code');
+      return false;
     }
   };
 

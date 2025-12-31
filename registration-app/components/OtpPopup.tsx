@@ -4,12 +4,39 @@ import { Modal, View, Text, TextInput, Pressable, StyleSheet } from 'react-nativ
 interface OtpPopupProps {
   visible: boolean;
   onClose: () => void;
-  onVerify: (otp: string) => void;
+  onVerify: (otp: string) => Promise<boolean>;
   email: string;
 }
 
 export const OtpPopup: React.FC<OtpPopupProps> = ({ visible, onClose, onVerify, email }) => {
   const [otp, setOtp] = useState('');
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [message, setMessage] = useState('');
+
+  const handleVerify = async () => {
+    if (otp.length === 6) {
+      setIsVerifying(true);
+      setMessage('Verifying...');
+      try {
+        const success = await onVerify(otp);
+        if (success) {
+          setMessage('Verification successful!');
+          setTimeout(() => {
+            onClose();
+            setMessage('');
+            setOtp('');
+            setIsVerifying(false);
+          }, 1500);
+        } else {
+          setMessage('Invalid OTP. Please try again.');
+          setIsVerifying(false);
+        }
+      } catch (error) {
+        setMessage('An error occurred. Please try again.');
+        setIsVerifying(false);
+      }
+    }
+  };
 
   return (
     <Modal
@@ -32,17 +59,34 @@ export const OtpPopup: React.FC<OtpPopupProps> = ({ visible, onClose, onVerify, 
             maxLength={6}
             value={otp}
             onChangeText={setOtp}
+            editable={!isVerifying}
           />
 
+          {message ? (
+            <Text style={[
+              styles.message,
+              message.includes('successful') ? styles.successMessage : styles.errorMessage
+            ]}>
+              {message}
+            </Text>
+          ) : null}
+
           <View style={styles.buttonContainer}>
-            <Pressable style={[styles.button, styles.cancelButton]} onPress={onClose}>
+            <Pressable 
+              style={[styles.button, styles.cancelButton]} 
+              onPress={onClose}
+              disabled={isVerifying}
+            >
               <Text style={styles.buttonText}>Cancel</Text>
             </Pressable>
             <Pressable 
-              style={[styles.button, styles.verifyButton]} 
-              onPress={() => onVerify(otp)}
+              style={[styles.button, styles.verifyButton, isVerifying && styles.disabledButton]} 
+              onPress={handleVerify}
+              disabled={isVerifying}
             >
-              <Text style={styles.buttonText}>Verify</Text>
+              <Text style={styles.buttonText}>
+                {isVerifying ? 'Verifying...' : 'Verify'}
+              </Text>
             </Pressable>
           </View>
         </View>
@@ -91,7 +135,18 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 24,
     letterSpacing: 4,
-    marginBottom: 20,
+    marginBottom: 10,
+  },
+  message: {
+    fontSize: 14,
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+  successMessage: {
+    color: '#28a745',
+  },
+  errorMessage: {
+    color: '#dc3545',
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -104,6 +159,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     marginHorizontal: 5,
+  },
+  disabledButton: {
+    opacity: 0.5,
   },
   cancelButton: {
     backgroundColor: '#666',
