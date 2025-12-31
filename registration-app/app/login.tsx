@@ -1,9 +1,11 @@
 import { StyleSheet, View, Text, Pressable, TextInput, ScrollView, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
+import { useAuth } from '@/context/AuthContext';
 
 export default function LoginScreen() {
   const router = useRouter();
+  const { setCredentials } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -13,6 +15,7 @@ export default function LoginScreen() {
     if (email && password) {
       setLoading(true);
       setTimeout(() => {
+        setCredentials(email, password);
         Alert.alert('Success', 'Login successful!');
         router.push('/(tabs)');
         setLoading(false);
