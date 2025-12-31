@@ -66,6 +66,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.log(`OTP for ${email}:`);
       console.log(`${otp}`);
       console.log(`═══════════════════════════════════════`);
+      
+      // Send OTP via email
+      try {
+        const response = await fetch('http://localhost:3001/api/auth/send-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, otp }),
+        });
+        
+        if (response.ok) {
+          console.log('OTP email sent successfully');
+        } else {
+          console.warn('Email sending failed:', await response.text());
+        }
+      } catch (emailError) {
+        console.warn('Email service is not available. OTP shown in console.', emailError);
+      }
     } catch (error: any) {
       console.error('SignUp error:', error);
       throw error;
