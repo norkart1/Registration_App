@@ -1,87 +1,69 @@
-import React, { createContext, useState, ReactNode } from 'react';
-import { hashPassword } from '@/utils/hash';
+import React, { createContext, useState, ReactNode, useContext } from 'react';
+import { account, ID } from '@/utils/appwrite';
 
 interface AuthContextType {
-  email: string | null;
-  passwordHash: string | null;
-  pendingEmail: string | null;
-  pendingPasswordHash: string | null;
-  otp: string | null;
-  setCredentials: (email: string, passwordHash: string) => void;
-  setPendingCredentials: (email: string, passwordHash: string) => void;
-  generateOTP: () => string;
-  verifyOTP: (inputOtp: string) => Promise<boolean>;
-  clearOTP: () => void;
+  user: any | null;
+  loading: boolean;
+  signUp: (email: string, pass: string) => Promise<void>;
+  login: (email: string, pass: string) => Promise<void>;
+  verifyOTP: (otp: string) => Promise<boolean>;
   logout: () => void;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [email, setEmail] = useState<string | null>(null);
-  const [passwordHash, setPasswordHash] = useState<string | null>(null);
-  const [pendingEmail, setPendingEmail] = useState<string | null>(null);
-  const [pendingPasswordHash, setPendingPasswordHash] = useState<string | null>(null);
-  const [otp, setOtp] = useState<string | null>(null);
+  const [user, setUser] = useState<any | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const setCredentials = (newEmail: string, newPasswordHash: string) => {
-    setEmail(newEmail);
-    setPasswordHash(newPasswordHash);
-    setPendingEmail(null);
-    setPendingPasswordHash(null);
-    setOtp(null);
+  const signUp = async (email: string, pass: string) => {
+    setLoading(true);
+    try {
+      await account.create(ID.unique(), email, pass);
+      await account.createEmailPasswordSession(email, pass);
+      await account.createEmailToken(ID.unique(), email);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const setPendingCredentials = (newEmail: string, newPasswordHash: string) => {
-    setPendingEmail(newEmail);
-    setPendingPasswordHash(newPasswordHash);
+  const login = async (email: string, pass: string) => {
+    setLoading(true);
+    try {
+      const session = await account.createEmailPasswordSession(email, pass);
+      const currentUser = await account.get();
+      setUser(currentUser);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const generateOTP = () => {
-    const generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
-    setOtp(generatedOtp);
-    return generatedOtp;
+  const verifyOTP = async (otp: string) => {
+    try {
+      const currentUser = await account.get();
+      await account.updateVerification(currentUser.$id, otp);
+      setUser({ ...currentUser, emailVerification: true });
+      return true;
+    } catch (error) {
+      console.error('OTP verification failed:', error);
+      return false;
+    }
   };
 
-  const verifyOTP = async (inputOtp: string) => {
-    return otp === inputOtp;
-  };
-
-  const clearOTP = () => {
-    setOtp(null);
-    setPendingEmail(null);
-    setPendingPasswordHash(null);
-  };
-
-  const logout = () => {
-    setEmail(null);
-    setPasswordHash(null);
-    setOtp(null);
+  const logout = async () => {
+    await account.deleteSession('current');
+    setUser(null);
   };
 
   return (
-    <AuthContext.Provider 
-      value={{ 
-        email, 
-        passwordHash, 
-        pendingEmail,
-        pendingPasswordHash,
-        otp,
-        setCredentials, 
-        setPendingCredentials,
-        generateOTP,
-        verifyOTP,
-        clearOTP,
-        logout 
-      }}
-    >
+    <AuthContext.Provider value={{ user, loading, signUp, login, verifyOTP, logout }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
 export function useAuth() {
-  const context = React.useContext(AuthContext);
+  const context = useContext(AuthContext);
   if (context === undefined) {
     throw new Error('useAuth must be used within AuthProvider');
   }

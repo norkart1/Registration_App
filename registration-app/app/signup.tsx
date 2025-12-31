@@ -2,52 +2,24 @@ import { StyleSheet, View, Text, Pressable, TextInput, ScrollView, Alert } from 
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { hashPassword } from '@/utils/hash';
 import { OtpPopup } from '@/components/OtpPopup';
-import { sendOtpEmail } from '@/utils/email';
 
 export default function SignUpScreen() {
   const router = useRouter();
-  const { setPendingCredentials, generateOTP, verifyOTP, setCredentials } = useAuth();
+  const { signUp, verifyOTP, loading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [otpVisible, setOtpVisible] = useState(false);
-  const [currentHash, setCurrentHash] = useState('');
-
-  const generatePassword = () => {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%';
-    let pass = '';
-    for (let i = 0; i < 12; i++) {
-      pass += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    setPassword(pass);
-    setConfirmPassword(pass);
-  };
 
   const handleSignUp = async () => {
     if (email && password && confirmPassword && password === confirmPassword) {
-      setLoading(true);
       try {
-        const hashedPassword = await hashPassword(password);
-        setCurrentHash(hashedPassword);
-        setPendingCredentials(email, hashedPassword);
-        const otp = generateOTP();
-        console.log(`Generated OTP: ${otp} for ${email}`);
-        
-        const result = await sendOtpEmail(email, otp);
-        if (!result.success) {
-          Alert.alert('Error', `Failed to send verification email: ${result.error}`);
-          return;
-        }
-        
+        await signUp(email, password);
         setOtpVisible(true);
-      } catch (error) {
-        Alert.alert('Error', 'Failed to process registration');
-      } finally {
-        setLoading(false);
+      } catch (error: any) {
+        Alert.alert('Error', error.message || 'Failed to process registration');
       }
     }
   };
@@ -55,7 +27,6 @@ export default function SignUpScreen() {
   const handleVerifyOtp = async (otp: string) => {
     const isValid = await verifyOTP(otp);
     if (isValid) {
-      setCredentials(email, currentHash);
       setOtpVisible(false);
       router.push('/(tabs)');
       return true;
@@ -89,9 +60,6 @@ export default function SignUpScreen() {
           <View style={styles.formGroup}>
             <View style={styles.passwordHeader}>
               <Text style={styles.label}>Password</Text>
-              <Pressable onPress={generatePassword}>
-                <Text style={styles.suggestLink}>Suggest</Text>
-              </Pressable>
             </View>
             <View style={styles.passwordContainer}>
               <TextInput
