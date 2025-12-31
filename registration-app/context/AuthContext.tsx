@@ -53,9 +53,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signUp = async (email: string, pass: string) => {
     setLoading(true);
     try {
-      // Create user account in Appwrite
-      await account.create(ID.unique(), email, pass);
-      
       // Store password for MongoDB (hashing will happen in the API)
       userPasswords[email] = pass;
       
@@ -115,11 +112,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           console.warn('MongoDB save warning:', apiError);
         }
         
-        // Get current user and set as authenticated
-        const currentUser = await account.get();
-        setUser(currentUser);
-        setEmail(currentUser.email);
-        setPasswordHash('User verified');
+        // Create Appwrite account for session management
+        try {
+          await account.create(ID.unique(), tempEmail, userPasswords[tempEmail]);
+          await account.createEmailPasswordSession(tempEmail, userPasswords[tempEmail]);
+          const currentUser = await account.get();
+          setUser(currentUser);
+          setEmail(currentUser.email);
+          setPasswordHash('User verified');
+        } catch (appwriteError) {
+          console.warn('Appwrite account creation warning:', appwriteError);
+          // Still mark as verified even if Appwrite fails
+          setUser({ email: tempEmail });
+          setEmail(tempEmail);
+          setPasswordHash('User verified');
+        }
         
         // Cleanup
         delete otpStorage[tempEmail];
