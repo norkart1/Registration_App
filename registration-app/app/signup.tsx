@@ -3,6 +3,7 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { OtpPopup } from '@/components/OtpPopup';
+import { ThemedText } from '@/components/ThemedText';
 
 export default function SignUpScreen() {
   const router = useRouter();
@@ -97,9 +98,9 @@ export default function SignUpScreen() {
               onChangeText={setConfirmPassword}
               editable={!loading}
             />
-            {confirmPassword && password !== confirmPassword && (
+            {confirmPassword !== '' && password !== confirmPassword ? (
               <Text style={styles.errorText}>Passwords don't match</Text>
-            )}
+            ) : null}
           </View>
         </View>
 
@@ -152,8 +153,15 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     padding: 32,
     alignItems: 'center',
-    boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
     elevation: 5,
+    marginVertical: 20,
   },
   logo: {
     fontSize: 32,
