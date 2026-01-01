@@ -15,11 +15,13 @@ export const OtpPopup: React.FC<OtpPopupProps> = ({ visible, onClose, onVerify, 
   const [showTestOTP, setShowTestOTP] = useState(false);
 
   const handleVerify = async () => {
+    console.log('Verifying OTP:', otp);
     if (otp.length === 6) {
       setIsVerifying(true);
       setMessage('Verifying...');
       try {
         const success = await onVerify(otp);
+        console.log('Verification success:', success);
         if (success) {
           setMessage('Verification successful!');
           setTimeout(() => {
@@ -34,6 +36,7 @@ export const OtpPopup: React.FC<OtpPopupProps> = ({ visible, onClose, onVerify, 
           setIsVerifying(false);
         }
       } catch (error: any) {
+        console.error('Verify handler error:', error);
         setMessage(error.message || 'Verification failed. Please try again.');
         setIsVerifying(false);
       }
@@ -48,7 +51,7 @@ export const OtpPopup: React.FC<OtpPopupProps> = ({ visible, onClose, onVerify, 
 
   return (
     <Modal
-      animationType="fade"
+      animationType="slide"
       transparent={true}
       visible={visible}
       onRequestClose={onClose}
@@ -60,15 +63,18 @@ export const OtpPopup: React.FC<OtpPopupProps> = ({ visible, onClose, onVerify, 
             We've sent a 6-digit verification code to {email}. Enter the code below to verify your account.
           </Text>
           
-          <TextInput
-            style={styles.input}
-            placeholder="000000"
-            keyboardType="numeric"
-            maxLength={6}
-            value={otp}
-            onChangeText={setOtp}
-            editable={!isVerifying}
-          />
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder="000000"
+              keyboardType="number-pad"
+              maxLength={6}
+              value={otp}
+              onChangeText={setOtp}
+              autoFocus={true}
+              editable={!isVerifying}
+            />
+          </View>
 
           {message ? (
             <Text style={[
@@ -132,10 +138,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 35,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
+    boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.25)',
     elevation: 5,
   },
   modalTitle: {
@@ -150,6 +153,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 20,
   },
+  inputContainer: {
+    width: '100%',
+    marginBottom: 10,
+  },
   input: {
     width: '100%',
     height: 50,
@@ -159,7 +166,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 24,
     letterSpacing: 4,
-    marginBottom: 10,
+    color: '#1A1A1A',
+    backgroundColor: '#FFFFFF',
   },
   message: {
     fontSize: 14,

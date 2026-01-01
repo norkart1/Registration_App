@@ -80,7 +80,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           body: JSON.stringify({ email, otp }),
         });
         
-        const responseData = await response.json();
+        // Wait for JSON but handle if it fails
+        let responseData = { success: false, message: 'Unknown error' };
+        try {
+          responseData = await response.json();
+        } catch (e) {
+          console.warn('Could not parse JSON response');
+        }
+
         if (response.ok) {
           console.log('OTP email sent successfully:', responseData);
         } else {
@@ -94,6 +101,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.error('SignUp error:', error);
       throw error;
     } finally {
+      // Don't set loading to false here because we need to keep it true 
+      // while the popup might be preparing, or let the component handle it
       setLoading(false);
     }
   };
