@@ -19,8 +19,19 @@ export default function SignUpScreen() {
         console.log('Starting sign up for:', email);
         await signUp(email, password);
         console.log('Sign up successful, showing OTP popup');
-        setOtpVisible(true);
+        // Use a small delay and force state update
+        setOtpVisible(false);
+        setTimeout(() => {
+          setOtpVisible(true);
+        }, 300);
       } catch (error: any) {
+        console.error('Sign up handler error:', error);
+        Alert.alert('Error', error.message || 'Failed to process registration');
+      }
+    } else {
+      Alert.alert('Validation Error', 'Please check your inputs');
+    }
+  };
         console.error('Sign up handler error:', error);
         Alert.alert('Error', error.message || 'Failed to process registration');
       }
