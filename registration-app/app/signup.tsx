@@ -19,19 +19,8 @@ export default function SignUpScreen() {
         console.log('Starting sign up for:', email);
         await signUp(email, password);
         console.log('Sign up successful, showing OTP popup');
-        // Use a small delay and force state update
-        setOtpVisible(false);
-        setTimeout(() => {
-          setOtpVisible(true);
-        }, 300);
+        setOtpVisible(true);
       } catch (error: any) {
-        console.error('Sign up handler error:', error);
-        Alert.alert('Error', error.message || 'Failed to process registration');
-      }
-    } else {
-      Alert.alert('Validation Error', 'Please check your inputs');
-    }
-  };
         console.error('Sign up handler error:', error);
         Alert.alert('Error', error.message || 'Failed to process registration');
       }
@@ -59,83 +48,85 @@ export default function SignUpScreen() {
   const isFormValid = email && password && confirmPassword && password === confirmPassword;
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
-      <View style={styles.card}>
-        <Text style={styles.logo}>NorkCraft</Text>
-        <Text style={styles.title}>Create your Account</Text>
+    <View style={{ flex: 1 }}>
+      <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
+        <View style={styles.card}>
+          <Text style={styles.logo}>NorkCraft</Text>
+          <Text style={styles.title}>Create your Account</Text>
 
-        <View style={styles.form}>
-          <View style={styles.formGroup}>
-            <Text style={styles.label}>Email</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter your email"
-              placeholderTextColor="#CCCCCC"
-              keyboardType="email-address"
-              value={email}
-              onChangeText={setEmail}
-              autoCapitalize="none"
-              editable={!loading}
-            />
-          </View>
-
-          <View style={styles.formGroup}>
-            <Text style={styles.label}>Password</Text>
-            <View style={styles.passwordContainer}>
+          <View style={styles.form}>
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>Email</Text>
               <TextInput
-                style={styles.passwordInput}
-                placeholder="Enter password"
+                style={styles.input}
+                placeholder="Enter your email"
                 placeholderTextColor="#CCCCCC"
-                secureTextEntry={!showPassword}
-                value={password}
-                onChangeText={setPassword}
+                keyboardType="email-address"
+                value={email}
+                onChangeText={setEmail}
+                autoCapitalize="none"
                 editable={!loading}
               />
-              <Pressable onPress={() => setShowPassword(!showPassword)}>
-                <Text style={styles.eyeIcon}>{showPassword ? '👁️' : '👁️‍🗨️'}</Text>
-              </Pressable>
+            </View>
+
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>Password</Text>
+              <View style={styles.passwordContainer}>
+                <TextInput
+                  style={styles.passwordInput}
+                  placeholder="Enter password"
+                  placeholderTextColor="#CCCCCC"
+                  secureTextEntry={!showPassword}
+                  value={password}
+                  onChangeText={setPassword}
+                  editable={!loading}
+                />
+                <Pressable onPress={() => setShowPassword(!showPassword)}>
+                  <Text style={styles.eyeIcon}>{showPassword ? '👁️' : '👁️‍🗨️'}</Text>
+                </Pressable>
+              </View>
+            </View>
+
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>Confirm Password</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Confirm password"
+                placeholderTextColor="#CCCCCC"
+                secureTextEntry
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+                editable={!loading}
+              />
+              {confirmPassword !== '' && password !== confirmPassword ? (
+                <Text style={styles.errorText}>Passwords don't match</Text>
+              ) : null}
             </View>
           </View>
 
-          <View style={styles.formGroup}>
-            <Text style={styles.label}>Confirm Password</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Confirm password"
-              placeholderTextColor="#CCCCCC"
-              secureTextEntry
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-              editable={!loading}
-            />
-            {confirmPassword !== '' && password !== confirmPassword ? (
-              <Text style={styles.errorText}>Passwords don't match</Text>
-            ) : null}
+          <Pressable 
+            style={[
+              styles.primaryButton,
+              (!isFormValid || loading) && styles.disabledButton
+            ]}
+            onPress={handleSignUp}
+            disabled={!isFormValid || loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="white" />
+            ) : (
+              <Text style={styles.primaryButtonText}>Sign up</Text>
+            )}
+          </Pressable>
+
+          <View style={styles.loginPrompt}>
+            <Text style={styles.promptText}>Already have an account? </Text>
+            <Pressable onPress={() => router.push('/login')}>
+              <Text style={styles.promptLink}>Sign in</Text>
+            </Pressable>
           </View>
         </View>
-
-        <Pressable 
-          style={[
-            styles.primaryButton,
-            (!isFormValid || loading) && styles.disabledButton
-          ]}
-          onPress={handleSignUp}
-          disabled={!isFormValid || loading}
-        >
-          {loading ? (
-            <ActivityIndicator color="white" />
-          ) : (
-            <Text style={styles.primaryButtonText}>Sign up</Text>
-          )}
-        </Pressable>
-
-        <View style={styles.loginPrompt}>
-          <Text style={styles.promptText}>Already have an account? </Text>
-          <Pressable onPress={() => router.push('/login')}>
-            <Text style={styles.promptLink}>Sign in</Text>
-          </Pressable>
-        </View>
-      </View>
+      </ScrollView>
 
       <OtpPopup
         visible={otpVisible}
@@ -143,7 +134,7 @@ export default function SignUpScreen() {
         onClose={() => setOtpVisible(false)}
         onVerify={handleVerifyOtp}
       />
-    </ScrollView>
+    </View>
   );
 }
 
