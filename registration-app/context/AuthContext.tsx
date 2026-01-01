@@ -69,7 +69,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       // Send OTP via email
       try {
-        const backendUrl = process.env.EXPO_PUBLIC_BACKEND_URL || 'http://localhost:3001';
+        const backendUrl = process.env.EXPO_PUBLIC_BACKEND_URL || 'https://serverregistration.vercel.app/';
         const response = await fetch(`${backendUrl}/api/auth/send-otp`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
