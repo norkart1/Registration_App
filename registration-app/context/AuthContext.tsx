@@ -70,6 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Send OTP via email
       try {
         const backendUrl = process.env.EXPO_PUBLIC_BACKEND_URL || 'https://serverregistration.vercel.app';
+        console.log('Sending OTP to backend:', backendUrl);
         const response = await fetch(`${backendUrl}/api/auth/send-otp`, {
           method: 'POST',
           headers: { 
@@ -79,10 +80,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           body: JSON.stringify({ email, otp }),
         });
         
+        const responseData = await response.json();
         if (response.ok) {
-          console.log('OTP email sent successfully');
+          console.log('OTP email sent successfully:', responseData);
         } else {
-          console.warn('Email sending failed:', await response.text());
+          console.warn('Email sending failed:', responseData);
+          // We still show the popup because the OTP is generated locally
         }
       } catch (emailError) {
         console.warn('Email service is not available. OTP shown in console.', emailError);

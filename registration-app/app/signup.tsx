@@ -16,12 +16,16 @@ export default function SignUpScreen() {
   const handleSignUp = async () => {
     if (email && password && confirmPassword && password === confirmPassword) {
       try {
+        console.log('Starting sign up for:', email);
         await signUp(email, password);
-        // The popup is now just a placeholder for "Check your email"
+        console.log('Sign up successful, showing OTP popup');
         setOtpVisible(true);
       } catch (error: any) {
+        console.error('Sign up handler error:', error);
         Alert.alert('Error', error.message || 'Failed to process registration');
       }
+    } else {
+      Alert.alert('Validation Error', 'Please check your inputs');
     }
   };
 
