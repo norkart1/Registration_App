@@ -3,7 +3,6 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { OtpPopup } from '@/components/OtpPopup';
-import { ThemedText } from '@/components/ThemedText';
 
 export default function SignUpScreen() {
   const router = useRouter();
