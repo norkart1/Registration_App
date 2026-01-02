@@ -41,21 +41,17 @@ waitForPort = 5000
 name = "registration-server"
 author = "agent"
 
+[workflows.workflow.metadata]
+outputType = "console"
+
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "cd Serverregistration-main && npm start"
 waitForPort = 3001
 
-[workflows.workflow.metadata]
-outputType = "console"
-
 [[ports]]
 localPort = 3001
 externalPort = 3001
-
-[[ports]]
-localPort = 5001
-externalPort = 80
 
 [userenv]
 
