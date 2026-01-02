@@ -4,7 +4,7 @@ modules = ["nodejs-20"]
 
 [nix]
 channel = "stable-25_05"
-packages = ["cowsay"]
+packages = ["cowsay", "unzip"]
 
 [agent]
 expertMode = true
@@ -21,6 +21,10 @@ author = "agent"
 task = "workflow.run"
 args = "registration-app-web"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "registration-server"
+
 [[workflows.workflow]]
 name = "registration-app-web"
 author = "agent"
@@ -33,13 +37,21 @@ task = "shell.exec"
 args = "cd registration-app && npx expo start --web --port 5000"
 waitForPort = 5000
 
+[[workflows.workflow]]
+name = "registration-server"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd Serverregistration-main && npm start"
+waitForPort = 3001
+
+[workflows.workflow.metadata]
+outputType = "console"
+
 [[ports]]
 localPort = 3001
 externalPort = 3001
-
-[[ports]]
-localPort = 5000
-externalPort = 5000
 
 [[ports]]
 localPort = 5001
