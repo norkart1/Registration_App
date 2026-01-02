@@ -69,8 +69,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       // Send OTP via email
       try {
-        const backendUrl = process.env.EXPO_PUBLIC_BACKEND_URL || 'https://serverregistration.vercel.app';
-        console.log('Sending OTP to backend:', backendUrl);
+        const backendUrl = (process.env.EXPO_PUBLIC_BACKEND_URL || 'https://serverregistration.vercel.app').replace(/\/+$/, '');
+        console.log('Sending OTP to backend:', `${backendUrl}/api/auth/send-otp`);
         const response = await fetch(`${backendUrl}/api/auth/send-otp`, {
           method: 'POST',
           headers: { 
@@ -79,6 +79,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           },
           body: JSON.stringify({ email, otp }),
         });
+        
+        console.log('Backend response status:', response.status);
         
         // Wait for JSON but handle if it fails
         let responseData = { success: false, message: 'Unknown error' };

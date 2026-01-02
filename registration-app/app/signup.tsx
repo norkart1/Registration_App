@@ -6,21 +6,22 @@ import { OtpPopup } from '@/components/OtpPopup';
 
 export default function SignUpScreen() {
   const router = useRouter();
-  const { signUp, verifyOTP, loading } = useAuth();
+  const { signUp, verifyOTP, loading: authLoading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [otpVisible, setOtpVisible] = useState(false);
+  const [localLoading, setLocalLoading] = useState(false);
 
   const handleSignUp = async () => {
     if (email && password && confirmPassword && password === confirmPassword) {
+      setLocalLoading(true);
       try {
         console.log('Starting sign up for:', email);
         await signUp(email, password);
         console.log('Sign up successful, redirecting to OTP verification');
         
-        // Use router.replace to ensure clean navigation
         router.replace({
           pathname: '/verify-otp',
           params: { email }
@@ -28,11 +29,15 @@ export default function SignUpScreen() {
       } catch (error: any) {
         console.error('Sign up handler error:', error);
         Alert.alert('Error', error.message || 'Failed to process registration');
+      } finally {
+        setLocalLoading(false);
       }
     } else {
       Alert.alert('Validation Error', 'Please check your inputs');
     }
   };
+
+  const isLoading = authLoading || localLoading;
 
   const handleVerifyOtp = async (otp: string) => {
     try {
@@ -70,7 +75,7 @@ export default function SignUpScreen() {
                 value={email}
                 onChangeText={setEmail}
                 autoCapitalize="none"
-                editable={!loading}
+                editable={!isLoading}
               />
             </View>
 
@@ -84,7 +89,7 @@ export default function SignUpScreen() {
                   secureTextEntry={!showPassword}
                   value={password}
                   onChangeText={setPassword}
-                  editable={!loading}
+                  editable={!isLoading}
                 />
                 <Pressable onPress={() => setShowPassword(!showPassword)}>
                   <Text style={styles.eyeIcon}>{showPassword ? '👁️' : '👁️‍🗨️'}</Text>
@@ -101,7 +106,7 @@ export default function SignUpScreen() {
                 secureTextEntry
                 value={confirmPassword}
                 onChangeText={setConfirmPassword}
-                editable={!loading}
+                editable={!isLoading}
               />
               {confirmPassword !== '' && password !== confirmPassword ? (
                 <Text style={styles.errorText}>Passwords don't match</Text>
@@ -112,12 +117,12 @@ export default function SignUpScreen() {
           <Pressable 
             style={[
               styles.primaryButton,
-              (!isFormValid || loading) && styles.disabledButton
+              (!isFormValid || isLoading) && styles.disabledButton
             ]}
             onPress={handleSignUp}
-            disabled={!isFormValid || loading}
+            disabled={!isFormValid || isLoading}
           >
-            {loading ? (
+            {isLoading ? (
               <ActivityIndicator color="white" />
             ) : (
               <Text style={styles.primaryButtonText}>Sign up</Text>
