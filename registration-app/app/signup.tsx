@@ -14,26 +14,42 @@ export default function SignUpScreen() {
   const [otpVisible, setOtpVisible] = useState(false);
   const [localLoading, setLocalLoading] = useState(false);
 
+  const validateEmail = (email: string) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+  };
+
   const handleSignUp = async () => {
-    if (email && password && confirmPassword && password === confirmPassword) {
-      setLocalLoading(true);
-      try {
-        console.log('Starting sign up for:', email);
-        await signUp(email, password);
-        console.log('Sign up successful, redirecting to OTP verification');
-        
-        router.replace({
-          pathname: '/verify-otp',
-          params: { email }
-        });
-      } catch (error: any) {
-        console.error('Sign up handler error:', error);
-        Alert.alert('Error', error.message || 'Failed to process registration');
-      } finally {
-        setLocalLoading(false);
-      }
-    } else {
-      Alert.alert('Validation Error', 'Please check your inputs');
+    if (!validateEmail(email)) {
+      Alert.alert('Invalid Email', 'Please enter a valid email address');
+      return;
+    }
+
+    if (password.length < 6) {
+      Alert.alert('Weak Password', 'Password must be at least 6 characters long');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      Alert.alert('Validation Error', 'Passwords do not match');
+      return;
+    }
+
+    setLocalLoading(true);
+    try {
+      console.log('Starting sign up for:', email);
+      await signUp(email, password);
+      console.log('Sign up successful, redirecting to OTP verification');
+      
+      router.replace({
+        pathname: '/verify-otp',
+        params: { email }
+      });
+    } catch (error: any) {
+      console.error('Sign up handler error:', error);
+      Alert.alert('Error', error.message || 'Failed to process registration');
+    } finally {
+      setLocalLoading(false);
     }
   };
 

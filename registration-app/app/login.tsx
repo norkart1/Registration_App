@@ -10,14 +10,27 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
+  const validateEmail = (email: string) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+  };
+
   const handleLogin = async () => {
-    if (email && password) {
-      try {
-        await login(email, password);
-        router.push('/(tabs)');
-      } catch (error: any) {
-        Alert.alert('Error', error.message || 'Login failed');
-      }
+    if (!validateEmail(email)) {
+      Alert.alert('Invalid Email', 'Please enter a valid email address');
+      return;
+    }
+
+    if (!password) {
+      Alert.alert('Error', 'Please enter your password');
+      return;
+    }
+
+    try {
+      await login(email, password);
+      router.push('/(tabs)');
+    } catch (error: any) {
+      Alert.alert('Login Error', error.message || 'Invalid email or password');
     }
   };
 
