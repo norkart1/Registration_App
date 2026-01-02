@@ -1,29 +1,33 @@
-import { StyleSheet, View, Text, Pressable, TextInput, ScrollView, Alert } from 'react-native';
-import { useRouter } from 'expo-router';
+import { StyleSheet, View, Text, Pressable, TextInput, ScrollView, Alert, ActivityIndicator } from 'react-native';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 
 export default function VerifyOTPScreen() {
   const router = useRouter();
-  const { pendingEmail, verifyOTP, setCredentials, clearOTP } = useAuth();
+  const { email: paramEmail } = useLocalSearchParams<{ email: string }>();
+  const { verifyOTP, loading: authLoading } = useAuth();
   const [otp, setOtp] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [localLoading, setLocalLoading] = useState(false);
 
-  const handleVerify = () => {
+  const isLoading = authLoading || localLoading;
+
+  const handleVerify = async () => {
     if (otp.length === 6) {
-      setLoading(true);
-      setTimeout(() => {
-        if (verifyOTP(otp)) {
+      setLocalLoading(true);
+      try {
+        const success = await verifyOTP(otp);
+        if (success) {
           Alert.alert('Success', 'Email verified successfully!');
-          if (pendingEmail) {
-            setCredentials(pendingEmail, '');
-          }
-          router.push('/(tabs)');
+          router.replace('/welcome');
         } else {
           Alert.alert('Error', 'Invalid OTP. Please try again.');
         }
-        setLoading(false);
-      }, 500);
+      } catch (error: any) {
+        Alert.alert('Error', error.message || 'Verification failed');
+      } finally {
+        setLocalLoading(false);
+      }
     }
   };
 
@@ -38,7 +42,7 @@ export default function VerifyOTPScreen() {
       <View style={styles.card}>
         <Text style={styles.logo}>NorkCraft</Text>
         <Text style={styles.title}>Verify Your Email</Text>
-        <Text style={styles.subtitle}>Enter the 6-digit code sent to {pendingEmail}</Text>
+        <Text style={styles.subtitle}>Enter the 6-digit code sent to {paramEmail || 'your email'}</Text>
 
         <View style={styles.form}>
           <View style={styles.formGroup}>
@@ -51,6 +55,7 @@ export default function VerifyOTPScreen() {
               maxLength={6}
               value={otp}
               onChangeText={setOtp}
+              editable={!isLoading}
             />
           </View>
         </View>
@@ -58,12 +63,16 @@ export default function VerifyOTPScreen() {
         <Pressable 
           style={[
             styles.primaryButton,
-            (!isFormValid || loading) && styles.disabledButton
+            (!isFormValid || isLoading) && styles.disabledButton
           ]}
           onPress={handleVerify}
-          disabled={!isFormValid || loading}
+          disabled={!isFormValid || isLoading}
         >
-          <Text style={styles.primaryButtonText}>{loading ? 'Verifying...' : 'Verify'}</Text>
+          {isLoading ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <Text style={styles.primaryButtonText}>Verify</Text>
+          )}
         </Pressable>
 
         <View style={styles.resendContainer}>
@@ -73,10 +82,7 @@ export default function VerifyOTPScreen() {
           </Pressable>
         </View>
 
-        <Pressable onPress={() => {
-          clearOTP();
-          router.push('/signup');
-        }}>
+        <Pressable onPress={() => router.push('/signup')}>
           <Text style={styles.backLink}>Back to Sign Up</Text>
         </Pressable>
       </View>
