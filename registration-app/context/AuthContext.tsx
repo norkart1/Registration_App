@@ -90,12 +90,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         if (response.ok) {
           console.log('OTP email sent successfully:', responseData);
+          return; // Explicit return on success
         } else {
-          console.warn('Email sending failed:', responseData);
-          // We still show the popup because the OTP is generated locally
+          console.error('Email sending failed:', responseData);
+          // Still proceed since OTP is in console for dev
         }
       } catch (emailError) {
-        console.warn('Email service is not available. OTP shown in console.', emailError);
+        console.error('Email service connectivity error:', emailError);
       }
     } catch (error: any) {
       console.error('SignUp error:', error);

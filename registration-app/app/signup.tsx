@@ -19,7 +19,9 @@ export default function SignUpScreen() {
         console.log('Starting sign up for:', email);
         await signUp(email, password);
         console.log('Sign up successful, redirecting to OTP verification');
-        router.push({
+        
+        // Use router.replace to ensure clean navigation
+        router.replace({
           pathname: '/verify-otp',
           params: { email }
         });
