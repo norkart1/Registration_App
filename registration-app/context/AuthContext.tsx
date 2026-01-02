@@ -69,7 +69,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       // Send OTP via email
       try {
-        const backendUrl = process.env.EXPO_PUBLIC_BACKEND_URL || 'http://localhost:3001';
+        const backendUrl = 'http://localhost:3001';
         console.log('Sending OTP to backend:', `${backendUrl}/api/auth/send-otp`);
         const response = await fetch(`${backendUrl}/api/auth/send-otp`, {
           method: 'POST',
@@ -133,7 +133,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (storedOTP && storedOTP === otp) {
         // OTP is valid - save user data to MongoDB via API
         try {
-          const response = await fetch('/api/auth/register', {
+          const backendUrl = 'http://localhost:3001';
+          const response = await fetch(`${backendUrl}/api/auth/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
