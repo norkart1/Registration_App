@@ -18,8 +18,11 @@ export default function SignUpScreen() {
       try {
         console.log('Starting sign up for:', email);
         await signUp(email, password);
-        console.log('Sign up successful, showing OTP popup');
-        setOtpVisible(true);
+        console.log('Sign up successful, redirecting to OTP verification');
+        router.push({
+          pathname: '/verify-otp',
+          params: { email }
+        });
       } catch (error: any) {
         console.error('Sign up handler error:', error);
         Alert.alert('Error', error.message || 'Failed to process registration');
@@ -128,12 +131,7 @@ export default function SignUpScreen() {
         </View>
       </ScrollView>
 
-      <OtpPopup
-        visible={otpVisible}
-        email={email}
-        onClose={() => setOtpVisible(false)}
-        onVerify={handleVerifyOtp}
-      />
+      {/* OTP Popup removed in favor of dedicated page */}
     </View>
   );
 }
