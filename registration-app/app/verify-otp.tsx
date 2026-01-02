@@ -1,6 +1,6 @@
-import { StyleSheet, View, Text, Pressable, TextInput, ScrollView, Alert, ActivityIndicator, Image } from 'react-native';
+import { StyleSheet, View, Text, Pressable, TextInput, ScrollView, Alert, ActivityIndicator, Image, KeyboardAvoidingView, Platform } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -14,20 +14,44 @@ export default function VerifyOTPScreen() {
 
   const isLoading = authLoading || localLoading;
 
+  useEffect(() => {
+    // Auto-focus first input on mount
+    setTimeout(() => {
+      inputs.current[0]?.focus();
+    }, 500);
+  }, []);
+
   const handleOtpChange = (value: string, index: number) => {
+    // Only allow numbers
+    const cleanValue = value.replace(/[^0-9]/g, '');
+    if (cleanValue.length > 1) {
+      // Handle paste if needed, but for now just take the last char
+      const lastChar = cleanValue.charAt(cleanValue.length - 1);
+      const newOtp = [...otp];
+      newOtp[index] = lastChar;
+      setOtp(newOtp);
+      if (index < 5) inputs.current[index + 1]?.focus();
+      return;
+    }
+
     const newOtp = [...otp];
-    newOtp[index] = value;
+    newOtp[index] = cleanValue;
     setOtp(newOtp);
 
     // Auto-focus next input
-    if (value && index < 5) {
+    if (cleanValue && index < 5) {
       inputs.current[index + 1]?.focus();
     }
   };
 
   const handleKeyPress = (e: any, index: number) => {
-    if (e.nativeEvent.key === 'Backspace' && !otp[index] && index > 0) {
-      inputs.current[index - 1]?.focus();
+    if (e.nativeEvent.key === 'Backspace') {
+      if (!otp[index] && index > 0) {
+        const newOtp = [...otp];
+        newOtp[index - 1] = '';
+        setOtp(newOtp);
+        inputs.current[index - 1]?.focus();
+      }
     }
   };
 
@@ -54,18 +78,22 @@ export default function VerifyOTPScreen() {
   const maskEmail = (email: string) => {
     if (!email) return 'your email';
     const [user, domain] = email.split('@');
+    if (!user || !domain) return email;
     if (user.length <= 4) return email;
     return `${user.substring(0, 2)}***${user.substring(user.length - 2)}@${domain}`;
   };
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView 
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={styles.container}
+    >
       <LinearGradient
         colors={['#74A2F2', '#4A80E1']}
         style={styles.background}
       />
       
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
         <View style={styles.glassContainer}>
           <View style={styles.card}>
             <View style={styles.iconContainer}>
@@ -88,13 +116,14 @@ export default function VerifyOTPScreen() {
                 <TextInput
                   key={index}
                   ref={(ref) => { inputs.current[index] = ref; }}
-                  style={styles.otpInput}
+                  style={[styles.otpInput, digit ? styles.otpInputActive : null]}
                   value={digit}
                   onChangeText={(value) => handleOtpChange(value, index)}
                   onKeyPress={(e) => handleKeyPress(e, index)}
                   keyboardType="number-pad"
                   maxLength={1}
                   selectTextOnFocus
+                  autoComplete="one-time-code"
                 />
               ))}
             </View>
@@ -113,14 +142,14 @@ export default function VerifyOTPScreen() {
 
             <View style={styles.resendContainer}>
               <Text style={styles.promptText}>Didn't receive code? </Text>
-              <Pressable>
+              <Pressable onPress={() => Alert.alert('OTP Resent', 'A new code has been sent.')}>
                 <Text style={styles.resendLink}>Resend</Text>
               </Pressable>
             </View>
           </View>
         </View>
       </ScrollView>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -152,6 +181,7 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     padding: 32,
     alignItems: 'center',
+    width: '100%',
   },
   iconContainer: {
     marginBottom: 24,
@@ -192,8 +222,8 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   otpInput: {
-    width: 45,
-    height: 55,
+    width: 42,
+    height: 52,
     borderWidth: 1,
     borderColor: '#E5E7EB',
     borderRadius: 12,
@@ -202,6 +232,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#111827',
     backgroundColor: '#FFFFFF',
+  },
+  otpInputActive: {
+    borderColor: '#3B82F6',
+    borderWidth: 2,
   },
   verifyButton: {
     width: '100%',
